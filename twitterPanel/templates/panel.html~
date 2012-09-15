@@ -1,0 +1,75 @@
+<style type="text/css">
+  tr.odd{ background: #FFF; }
+  tr.even { background: #FFFFD4; }
+</style>
+
+  <script type="text/javascript">
+    $(function(){
+      $("#main").accordion({
+        header: "h3",
+        autoHeight: true
+      })
+      .hide()
+      .fadeIn(1500);
+
+      $('#updateTextArea').keyup(function(){ 
+        // text used for non-input elements. Var() is used for input elements
+        var tweetLength =  $('#updateTextArea').val().length;
+        $('#charCount').text( 140 - tweetLength );
+      });
+
+      $('#updateBtn').click(function(){
+        if($('#updateTextArea').val().length <= 140){
+          // submit 
+          $.post('{% url twitterPanel_update %}', $("#updateForm").serialize()); 
+          $("#updateStatus").text("last update: " + $('#updateTextArea').val());
+          // clear text area
+          $('#updateTextArea').val(""); 
+          // reset counter too
+          $('#charCount').text( "140" );
+        } 
+        return false;
+      });
+    });
+  </script>                        
+  
+  <div id="main">
+    <div>
+      <h3><a href="#">My Recent Tweets</a></h3>
+      <div>
+        {% if statuses %}
+          {% for s in statuses %}
+            <p style="border-top:1px dashed #f00; margin-top:1em; padding-top:1em font: 80% 'Trebuchet MS', sans-serif;">
+              {{ s.text }}
+            </p>
+          {% endfor %}
+        {% else %}
+          No tweets found
+        {% endif %}
+      </div>
+    </div>
+    <div>
+      <h3><a href="#">Update Status</a></h3>
+      <div>
+        <form action="#" id="updateForm" name="updateForm" method="POST">
+          <textarea id="updateTextArea" name="updateTextArea" rows=2 cols=70 />
+          <button id="updateBtn" class="ui-state-default ui-corner-all">Update</button>
+        </form>
+        <div id="charCount" name="charCount" value=140>140</div>
+        <div id="updateStatus" name="updateStatus"><!-- update message here --></div>
+      </div>
+    </div>
+    <div>
+      <h3><a href="#">Following</a></h3>
+      <div>
+        {% if following %}
+          {% for f in following %}
+            <img src="{{ f.GetProfileImageUrl }}" width=28 height=28 />
+          {% endfor %}
+        {% else %}
+          following variable is empty
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
